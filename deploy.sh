@@ -20,4 +20,4 @@ sudo rm -rf ~/chef &&
   mkdir ~/chef &&
   cd ~/chef &&
   tar x &&
-  sudo bash install.sh'
+  sudo -H bash install.sh'
