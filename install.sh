@@ -13,6 +13,7 @@ gembinary=$rubybindir/gem
 rubybinary=$rubybindir/ruby
 chefbinary=$rubybindir/chef-solo
 knifebinary=$rubybindir/knife
+http_proxy=http://192.168.33.13:3128/
 
 ######################################################################
 # Remove Vagrant ruby
@@ -31,6 +32,13 @@ remove_vagrant_ruby()
 ######################################################################
 update_base_os()
 {
+  local http_proxy=$1
+
+  if [ -n $http_proxy ]
+  then
+    echo "Acquire::http::Proxy \"$http_proxy\";" > /etc/apt/apt.conf.d/cache
+  fi
+
   # Upgrade headlessly (this is only safe-ish on vanilla systems)
   # aptitude update &&
   # apt-get -o dpkg::options::="--force-confnew" \
@@ -79,10 +87,7 @@ install_ruby()
 install_chef()
 {
   local gembinary=$1
-  if [ -z "$(which chef-solo &> /dev/null)" ]
-  then
-    $gembinary install --no-rdoc --no-ri chef
-  fi
+  command -v chef-solo >/dev/null 2>&1 || $gembinary install --no-rdoc --no-ri chef
 }
 
 ######################################################################
@@ -124,7 +129,7 @@ create_admin_chef_user()
 
 export DEBIAN_FRONTEND=noninteractive
 remove_vagrant_ruby
-update_base_os
+update_base_os $http_proxy
 install_ruby $rubyversion $rubydir $rubybinary
 install_chef $gembinary
 configure_chef
