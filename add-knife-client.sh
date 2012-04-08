@@ -7,13 +7,20 @@
 host=$1
 user=$2
 newuser=$3
-
+repodir=`pwd`
 chefdir=`pwd`/.chef
 
 if [[ ! -n $1 || ! -n $2 || ! -n $3 ]]
 then
   echo "Usage: ./add-knife-client.sh [host] [user] [newuser]"
   exit 1
+fi
+
+if [ ! -d $repodir/cookbooks ]
+then
+  echo "You seem to not be in a chef-repo."
+  echo "Please switch to a chef repo and try again."
+  exit 2
 fi
 
 mkdir .chef
@@ -34,4 +41,5 @@ validation_key           '$chefdir/validation.pem'
 chef_server_url          'http://$host:4000'
 cache_type               'BasicFile'
 cache_options( :path => '$chefdir/.chef/checksums' )
+cookbook_path [ '$repodir/cookbooks' ]
 EOT
