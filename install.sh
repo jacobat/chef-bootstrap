@@ -13,7 +13,7 @@ gembinary=$rubybindir/gem
 rubybinary=$rubybindir/ruby
 chefbinary=$rubybindir/chef-solo
 knifebinary=$rubybindir/knife
-http_proxy=http://192.168.33.13:3128/
+http_proxy=http://192.168.33.13:8000/
 
 ######################################################################
 # Remove Vagrant ruby
