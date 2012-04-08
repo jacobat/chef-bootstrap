@@ -28,9 +28,9 @@ remove_vagrant_ruby()
 }
 
 ######################################################################
-# Update base OS
+# Setup proxy
 ######################################################################
-update_base_os()
+setup_proxy()
 {
   local http_proxy=$1
 
@@ -38,7 +38,13 @@ update_base_os()
   then
     echo "Acquire::http::Proxy \"$http_proxy\";" > /etc/apt/apt.conf.d/cache
   fi
+}
 
+######################################################################
+# Update base OS
+######################################################################
+update_base_os()
+{
   # Upgrade headlessly (this is only safe-ish on vanilla systems)
   # aptitude update &&
   # apt-get -o dpkg::options::="--force-confnew" \
@@ -127,13 +133,24 @@ create_admin_chef_user()
   $knifebinary configure -i --defaults -u admin -r ''
 }
 
+setup_chef()
+{
+  local gembinary=$1
+  local chefbinary=$2
+  install_chef $gembinary
+  configure_chef
+  run_chef $chefbinary
+
+  # Hack: Sleep 2 to ensure certificates have been generated
+  sleep 2
+
+  create_admin_chef_user $knifebinary
+}
 export DEBIAN_FRONTEND=noninteractive
 remove_vagrant_ruby
-update_base_os $http_proxy
+setup_proxy $http_proxy
+update_base_os
 install_ruby $rubyversion $rubydir $rubybinary
-install_chef $gembinary
-configure_chef
-run_chef $chefbinary
-create_admin_chef_user $knifebinary
+setup_chef $gembinary $chefbinary
 
 echo "Done"
